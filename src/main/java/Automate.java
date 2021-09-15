@@ -6,21 +6,19 @@ import lombok.Setter;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
+import java.util.*;
 
 @Getter
 @Setter
 public class Automate {
-   private final LinkedHashSet<String> A = Sets.newLinkedHashSet();
-    private  final LinkedHashSet<String> Q = Sets.newLinkedHashSet();
+    private final LinkedHashSet<String> A = Sets.newLinkedHashSet();
+    private final LinkedHashSet<String> Q = Sets.newLinkedHashSet();
     private final LinkedHashSet<String> I = Sets.newLinkedHashSet();
     private final LinkedHashSet<String> T = Sets.newLinkedHashSet();
     private final LinkedHashMap<String, ArrayList<Transition>> E = Maps.newLinkedHashMap();
 
-    public int readFromFile() throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader("automate.txt"));
+    public void readFromFile(String fileName) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(fileName));
         String line = br.readLine();
         int alphabetCount = Integer.parseInt(line);
         char character = 'a';
@@ -71,14 +69,34 @@ public class Automate {
 
             line = br.readLine();
         } while (line != null);
+        br.close();
+    }
 
+    public void display() {
+
+
+        System.out.print("Etats \t\t\t ");
+        for (String a : A) {
+            System.out.print(a + "\t\t\t");
+        }
+        System.out.println("");
+        for (Map.Entry<String, ArrayList<Transition>> entry : E.entrySet()) {
+            System.out.print(entry.getKey() + "\t\t\t");
+            for (Transition t : entry.getValue()) {
+                System.out.print(t.arrivee + "\t\t\t\t");
+            }
+        }
+        System.out.println("");
         System.out.println(A);
         System.out.println(Q);
         System.out.println(I);
         System.out.println(T);
         System.out.println(E);
+    }
 
-        br.close();
-        return 1;
+    public void trier() {
+        for (Map.Entry<String, ArrayList<Transition>> entry : E.entrySet()) {
+            Collections.sort(entry.getValue());
+        }
     }
 }
