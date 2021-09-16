@@ -8,4 +8,7 @@ public class Etat {
     boolean isInitial;
     boolean isTerminal;
     List<Transition> transitions;
+
+
+
 }
