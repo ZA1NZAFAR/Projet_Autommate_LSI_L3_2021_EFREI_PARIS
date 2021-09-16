@@ -3,16 +3,14 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-		readFile();
+    public static void main(String[] args) {
+        Automate automate = new Automate();
+        try {
+            automate.readFromFile("automate.txt");
+            automate.trier();
+            automate.display();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
-
-	static void readFile() throws IOException {
-		BufferedReader br = new BufferedReader(new FileReader("automate.txt"));
-		String line = br.readLine();
-		while (line != null) {
-			System.out.println(line);
-			line = br.readLine();
-		}
-	}
 }
