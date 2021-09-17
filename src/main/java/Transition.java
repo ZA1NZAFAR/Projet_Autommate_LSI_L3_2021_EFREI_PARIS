@@ -13,8 +13,8 @@ public class Transition implements Comparable {
     public String toString() {
         return "Transition{" +
                 "value=" + value +
-                ", depart=" + depart.val +
-                ", arrivee=" + arrivee.val +
+                ", depart=" + depart.nom +
+                ", arrivee=" + arrivee.nom +
                 "}";
     }
 

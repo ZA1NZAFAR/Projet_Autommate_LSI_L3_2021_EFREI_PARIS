@@ -1,7 +1,6 @@
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,7 +11,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Etat {
-    int val;
+    int nom;
     boolean isInitial;
     boolean isTerminal;
     List<Transition> transitions;
@@ -28,7 +27,7 @@ public class Etat {
     @Override
     public String toString() {
         return "Etat{" +
-                "val=" + val +
+                "val=" + nom +
                 ", isInitial=" + isInitial +
                 ", isTerminal=" + isTerminal +
                 ", Transitions=" + transitions +

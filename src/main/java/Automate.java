@@ -80,15 +80,14 @@ public class Automate {
         }
         System.out.println("");
         for (Etat e : etats) {
-            System.out.print(e.val + indent.substring(0, indent.length() - 1));
+            System.out.print(e.nom + indent.substring(0, indent.length() - 1));
             for (char a : A) {
-                System.out.print(e.getListOfSuccessors(a)
-                        .stream()
-                        .map(etat -> etat.val)
-                        .collect(Collectors.toList()) + indent.substring(0, indent.length() - e.getListOfSuccessors(a)
-                        .stream()
-                        .map(etat -> etat.val)
-                        .collect(Collectors.toList()).toString().length()));
+                System.out.print(
+                        e.getListOfSuccessors(a)
+                                .stream()
+                                .map(etat -> etat.nom)
+                                .collect(Collectors.toList()) + indent.substring(0, indent.length() - e.getListOfSuccessors(a).stream().map(etat -> etat.nom)
+                                .collect(Collectors.toList()).toString().length()));
             }
             System.out.println();
         }
@@ -97,7 +96,7 @@ public class Automate {
 
     public Etat getEtatFromVal(int val) {
         for (Etat e : etats) {
-            if (e.val == val)
+            if (e.nom == val)
                 return e;
         }
         return null;
