@@ -1,18 +1,21 @@
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class Transition implements Comparable {
-    int depart;
-    int arrivee;
     char value;
+    Etat depart;
+    Etat arrivee;
 
     @Override
     public String toString() {
-        return depart + " " + value + " " + arrivee;
+        return "Transition{" +
+                "value=" + value +
+                ", depart=" + depart.val +
+                ", arrivee=" + arrivee.val +
+                "}";
     }
 
     @Override

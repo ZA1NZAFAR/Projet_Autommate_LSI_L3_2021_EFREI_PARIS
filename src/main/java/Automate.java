@@ -1,4 +1,3 @@
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
@@ -6,36 +5,38 @@ import lombok.Setter;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
 public class Automate {
-    private final LinkedHashSet<String> A = Sets.newLinkedHashSet();
-    private final LinkedHashSet<String> Q = Sets.newLinkedHashSet();
+    private final LinkedHashSet<Character> A = Sets.newLinkedHashSet();
     private final LinkedHashSet<String> I = Sets.newLinkedHashSet();
     private final LinkedHashSet<String> T = Sets.newLinkedHashSet();
-    private final LinkedHashMap<String, ArrayList<Transition>> E = Maps.newLinkedHashMap();
+    private List<Etat> etats = new ArrayList<>();
 
     public void readFromFile(String fileName) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(fileName));
         String line = br.readLine();
+
         int alphabetCount = Integer.parseInt(line);
         char character = 'a';
-
         // Alphabet - A
         for (int i = 0; i < alphabetCount; i++) {
-            A.add(String.valueOf(character++));
+            A.add(character++);
         }
 
         // Sommets - Q
         line = br.readLine();
         int sommetCount = Integer.parseInt(line);
 
-        int sommet = 1;
-        for (int i = 0; i < sommetCount; i++) {
-            Q.add(String.valueOf(sommet++));
+        for (int i = 1; i <= sommetCount; i++) {
+            etats.add(new Etat(i, false, false, new ArrayList<>()));
         }
+
 
         // Etats initiales - I
         line = br.readLine();
@@ -61,42 +62,52 @@ public class Automate {
             char value = values[1].charAt(0);
             int arrivee = Integer.parseInt(values[2]);
 
-            Transition transition = new Transition(depart, arrivee, value);
-
-            ArrayList<Transition> list = E.get(values[0]) == null ? new ArrayList<>() : E.get(values[0]);
-            list.add(transition);
-            E.put(values[0], list);
+            if (!etats.get(etats.indexOf(getEtatFromVal(depart))).hasSuccesseur(new Transition(value, getEtatFromVal(depart), getEtatFromVal(arrivee))))
+                etats.get(etats.indexOf(getEtatFromVal(depart))).getTransitions().add(new Transition(value, getEtatFromVal(depart), getEtatFromVal(arrivee)));
 
             line = br.readLine();
         } while (line != null);
+        updateTermInit();
         br.close();
     }
 
     public void display() {
+        String indent = String.format("%-" + (A.size() * 3) + "s", ""); // spaces.
 
-
-        System.out.print("Etats \t\t\t ");
-        for (String a : A) {
-            System.out.print(a + "\t\t\t");
+        System.out.print("Etats" + indent.substring(0, indent.length() - "Etats".length()));
+        for (char a : A) {
+            System.out.print(a + indent.substring(0, indent.length() - 1));
         }
         System.out.println("");
-        for (Map.Entry<String, ArrayList<Transition>> entry : E.entrySet()) {
-            System.out.print(entry.getKey() + "\t\t\t");
-            for (Transition t : entry.getValue()) {
-                System.out.print(t.arrivee + "\t\t\t\t");
+        for (Etat e : etats) {
+            System.out.print(e.val + indent.substring(0, indent.length() - 1));
+            for (char a : A) {
+                System.out.print(e.getListOfSuccessors(a)
+                        .stream()
+                        .map(etat -> etat.val)
+                        .collect(Collectors.toList()) + indent.substring(0, indent.length() - e.getListOfSuccessors(a)
+                        .stream()
+                        .map(etat -> etat.val)
+                        .collect(Collectors.toList()).toString().length()));
             }
+            System.out.println();
         }
-        System.out.println("");
-        System.out.println(A);
-        System.out.println(Q);
-        System.out.println(I);
-        System.out.println(T);
-        System.out.println(E);
     }
 
-    public void trier() {
-        for (Map.Entry<String, ArrayList<Transition>> entry : E.entrySet()) {
-            Collections.sort(entry.getValue());
+
+    public Etat getEtatFromVal(int val) {
+        for (Etat e : etats) {
+            if (e.val == val)
+                return e;
         }
+        return null;
     }
+
+    void updateTermInit() {
+        for (String s : I)
+            etats.get(etats.indexOf(getEtatFromVal(Integer.parseInt(s)))).setInitial(true);
+        for (String s : T)
+            etats.get(etats.indexOf(getEtatFromVal(Integer.parseInt(s)))).setTerminal(true);
+    }
+
 }
