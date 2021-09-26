@@ -1,3 +1,6 @@
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import lombok.Getter;
@@ -7,6 +10,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -18,9 +23,22 @@ public class Automate {
     private final LinkedHashSet<Etat> I = Sets.newLinkedHashSet();
     private final LinkedHashSet<Etat> T = Sets.newLinkedHashSet();
     private final LinkedHashMap<Etat, List<Transition>> E = Maps.newLinkedHashMap();
+    
+    public LinkedHashSet<Etat> getI() {
+    	return I;
+    }
+    
+    public LinkedHashSet<Etat> getT() {
+    	return T;
+    }
+    
+    public List<Transition> getTransitions(Etat etat) {
+    	return E.get(etat);
+    }
 
     public void readFromFile(String fileName) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(fileName));
+        @SuppressWarnings("resource")
+		BufferedReader br = new BufferedReader(new FileReader(fileName));
         
         String line = br.readLine();
         int alphabetCount = Integer.parseInt(line);
@@ -114,6 +132,55 @@ public class Automate {
         System.out.println("L'automate " + isStandard);
     }
     
+    public boolean reconnaitLeMot(List<Transition> currentTransitions, String mot) {
+    	int charIndex = 0;
+    	final String character = String.valueOf(mot.charAt(charIndex));
+    	
+    	// find last vertex cycle and store it's value
+    	int lastCycle = 0;
+    	List<Etat> etats = ImmutableList.copyOf(Q);
+    	for (int i = Q.size() - 1; i >= 0; i--) {
+    		Etat etat = etats.get(i);
+    		if (E.containsKey(etat)) {
+    			List<Transition> cycle = E.get(etat).stream().filter(t -> t.getCible().equals(etat)).collect(Collectors.toList());
+    			if (cycle.size() > 0) {
+    				lastCycle = i + 1;
+    				break;
+    			}
+    		}
+    	}
+    	
+    	if (mot.length() == Q.size() - lastCycle) {
+    		currentTransitions.removeIf(t -> t.getCourant().equals(t.getCible()));
+    	}	
+    	
+    	// if the last vertex contains a cycle
+    	if (currentTransitions.isEmpty()) {
+    		for (Etat etat : T) {
+    			if (E.containsKey(etat))
+    					return E.get(etat).stream().map(t -> t.getSymbole()).collect(Collectors.toList()).contains(character);
+        	}
+    	}
+    	
+        for (Transition transition : currentTransitions) {
+        	
+        	if (mot.length() <= 1 && transition.getSymbole().equals(character) && T.contains(transition.getCible())) {
+        		return true;
+        	} else if (mot.length() <= 1 && !transition.getSymbole().equals(character)) {
+        		break;
+        	}
+       
+        	String nextCharacter = String.valueOf(mot.charAt(1));
+        	
+        	List<Transition> transitions = E.get(transition.getCible()).stream().filter(t -> 
+        	t.getSymbole().equals(nextCharacter)).collect(Collectors.toList());
+        	
+            return reconnaitLeMot(transitions, mot.substring(charIndex + 1));
+        }
+    	
+        return false;
+    }
+    
     public boolean isStandard() {
     	if (I.size() != 1)
     		return false;
@@ -129,7 +196,6 @@ public class Automate {
     }
     
     public void standardiser() {
-    	// get list of transition of the first etat initial
     	List<Transition> transitions = new ArrayList<>();
     	
     	for (Etat etat : I) {
