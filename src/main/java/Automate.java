@@ -72,8 +72,9 @@ public class Automate {
     }
 
     public void display() {
-        System.out.println("Etat initiaux : " + I.toString() + "\nEtat Terminaux :" + T.toString());
-        String indent = String.format("%-" + (A.size() * 3) + "s", ""); // spaces.
+        System.out.println("Etat initiaux : " + I + "\nEtat Terminaux :" + T);
+
+        String indent = String.format("%-" + (A.size() * 3) + "s", "");
 
         System.out.print("Etats" + indent.substring(0, indent.length() - "Etats".length()));
         for (char a : A) {
@@ -83,11 +84,8 @@ public class Automate {
         for (Etat e : etats) {
             System.out.print(e.nom + indent.substring(0, indent.length() - 1));
             for (char a : A) {
-                System.out.print(
-                        e.getListOfSuccessors(a)
-                                .stream()
-                                .map(etat -> etat.nom)
-                                .collect(Collectors.toList()) + indent.substring(0, indent.length() - e.getListOfSuccessors(a).stream().map(etat -> etat.nom).collect(Collectors.toList()).toString().length()));
+                String temp = e.getListOfSuccessors(a).stream().map(etat -> etat.nom).collect(Collectors.toList()).toString();
+                System.out.print(temp + indent.substring(0, indent.length() - temp.length()));
             }
             System.out.println();
         }
