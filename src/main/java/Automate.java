@@ -34,7 +34,7 @@ public class Automate {
         int sommetCount = Integer.parseInt(line);
 
         for (int i = 1; i <= sommetCount; i++) {
-            etats.add(new Etat(i, false, false, new ArrayList<>()));
+            etats.add(new Etat(i + "", false, false, new ArrayList<>()));
         }
 
 
@@ -58,9 +58,9 @@ public class Automate {
         line = br.readLine();
         do {
             values = line.split("\\s");
-            int depart = Integer.parseInt(values[0]);
+            String depart = values[0];
             char value = values[1].charAt(0);
-            int arrivee = Integer.parseInt(values[2]);
+            String arrivee = values[2];
 
             if (!etats.get(etats.indexOf(getEtatFromVal(depart))).hasSuccesseur(new Transition(value, getEtatFromVal(depart), getEtatFromVal(arrivee))))
                 etats.get(etats.indexOf(getEtatFromVal(depart))).getTransitions().add(new Transition(value, getEtatFromVal(depart), getEtatFromVal(arrivee)));
@@ -72,6 +72,7 @@ public class Automate {
     }
 
     public void display() {
+        System.out.println("Etat initiaux : " + I.toString() + "\nEtat Terminaux :" + T.toString());
         String indent = String.format("%-" + (A.size() * 3) + "s", ""); // spaces.
 
         System.out.print("Etats" + indent.substring(0, indent.length() - "Etats".length()));
@@ -86,17 +87,16 @@ public class Automate {
                         e.getListOfSuccessors(a)
                                 .stream()
                                 .map(etat -> etat.nom)
-                                .collect(Collectors.toList()) + indent.substring(0, indent.length() - e.getListOfSuccessors(a).stream().map(etat -> etat.nom)
-                                .collect(Collectors.toList()).toString().length()));
+                                .collect(Collectors.toList()) + indent.substring(0, indent.length() - e.getListOfSuccessors(a).stream().map(etat -> etat.nom).collect(Collectors.toList()).toString().length()));
             }
             System.out.println();
         }
     }
 
 
-    public Etat getEtatFromVal(int val) {
+    public Etat getEtatFromVal(String val) {
         for (Etat e : etats) {
-            if (e.nom == val)
+            if (e.nom.equals(val))
                 return e;
         }
         return null;
@@ -104,9 +104,9 @@ public class Automate {
 
     void updateTermInit() {
         for (String s : I)
-            etats.get(etats.indexOf(getEtatFromVal(Integer.parseInt(s)))).setInitial(true);
+            etats.get(etats.indexOf(getEtatFromVal(s))).setInitial(true);
         for (String s : T)
-            etats.get(etats.indexOf(getEtatFromVal(Integer.parseInt(s)))).setTerminal(true);
+            etats.get(etats.indexOf(getEtatFromVal(s))).setTerminal(true);
     }
 
 }

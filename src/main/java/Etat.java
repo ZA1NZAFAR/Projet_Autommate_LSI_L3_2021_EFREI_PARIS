@@ -11,10 +11,15 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Etat {
-    int nom;
+    String nom;
     boolean isInitial;
     boolean isTerminal;
     List<Transition> transitions;
+
+    public Etat(String i) {
+        this.nom = i;
+        transitions = new ArrayList<>();
+    }
 
     Set<Etat> getSuccesseurs(char c) {
         Set<Etat> res = new HashSet<>();
