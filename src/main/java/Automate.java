@@ -1,4 +1,5 @@
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -10,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -18,17 +20,17 @@ import java.util.stream.Stream;
 @Getter
 @Setter
 public class Automate {
-    private final LinkedHashSet<String> A = Sets.newLinkedHashSet();
-    private final LinkedHashSet<Etat> Q = Sets.newLinkedHashSet();
-    private final LinkedHashSet<Etat> I = Sets.newLinkedHashSet();
-    private final LinkedHashSet<Etat> T = Sets.newLinkedHashSet();
-    private final LinkedHashMap<Etat, List<Transition>> E = Maps.newLinkedHashMap();
+    private final Set<String> A = Sets.newLinkedHashSet();
+    private final Set<Etat> Q = Sets.newLinkedHashSet();
+    private final Set<Etat> I = Sets.newLinkedHashSet();
+    private final Set<Etat> T = Sets.newLinkedHashSet();
+    private final Map<Etat, List<Transition>> E = Maps.newLinkedHashMap();
     
-    public LinkedHashSet<Etat> getI() {
+    public Set<Etat> getI() {
     	return I;
     }
     
-    public LinkedHashSet<Etat> getT() {
+    public Set<Etat> getT() {
     	return T;
     }
     
@@ -107,7 +109,7 @@ public class Automate {
         
         System.out.println("");
         for (Map.Entry<Etat, List<Transition>> e : E.entrySet()) {
-            System.out.print(e.getKey() + indent.substring(0, indent.length() - 1));
+            System.out.print(e.getKey() + indent.substring(0, indent.length() - e.getKey().getNom().length()));
             
             for (String a : A) {
                 System.out.print(
@@ -116,7 +118,7 @@ public class Automate {
                                 .stream()
                                 // get their end vertices (etats cibles)
                                 .map(transition -> transition.getCible())
-//                              // Store them in a list, add indentation for each vertex (etat)
+                                // Store them in a list, add indentation for each vertex (etat)
                                 .collect(Collectors.toList()) + indent.substring(0, indent.length() - 
                                 e.getValue().stream().filter(t -> t.getSymbole().equals(a)).collect(Collectors.toList())
                                 .stream().map(transition -> transition.getCible()).collect(Collectors.toList()).toString().length()));
@@ -128,8 +130,133 @@ public class Automate {
         System.out.println("\nLes etats initiaux : " + I);
         System.out.println("Les etats terminaux : " + T);
         
+        String isDeterministe = isDeterministe() == true ? "est déterministe" : "n'est pas déterministe";
+        System.out.println("L'automate " + isDeterministe);
         String isStandard = isStandard() == true ? "est standard" : "n'est pas standard";
         System.out.println("L'automate " + isStandard);
+    }
+    
+    public boolean isDeterministe() {
+    	if (I.size() != 1)
+    		return false;
+    	
+    	for (List<Transition> transitions : E.values()) {
+    		// Maps numbers of occurrences of each alphabet symbol to symbol itself, then filters out symbols with occurrences > 1
+    		if (transitions.stream().collect(Collectors.groupingBy(transition -> transition.getSymbole(), Collectors.counting()))
+    				.entrySet().stream().filter(occurrence -> occurrence.getValue() > 1).collect(Collectors.toList()).size() != 0)
+    			return false;
+    	}
+    	
+    	return true;
+    }
+    
+    public void determiniser() {
+    	Map<Etat, List<Transition>> automateDeterminise = Maps.newLinkedHashMap();
+    	List<Transition> transitions = new ArrayList<>();
+    	StringBuilder sb = new StringBuilder();
+    	
+    	I.forEach(etat -> sb.append(etat.getNom()));
+    	Etat etatCourant = new Etat(sb.toString());
+    	
+    	I.clear();
+    	I.add(etatCourant);
+    	automateDeterminise.put(etatCourant, new ArrayList<>());
+    	
+    	for (int i = 0; i < sb.length(); i++) {
+//    		To kindly say 'fuck-off' to compiler (Exp: variable i defined in an enclosing scope must be final or effectively final)
+    		final int index = i;
+    		List<Etat> etats = E.keySet().stream().filter(etat -> etat.getNom().equals(String.valueOf(sb.charAt(index))))
+    				.collect(Collectors.toList());
+    		
+    		for (Etat etat : etats)
+    			transitions = Lists.newArrayList(Iterables.concat(transitions, E.get(etat)));
+    	}
+    	
+    	sb.setLength(0);
+    	
+    	for (String symbole : A) {
+    		transitions.stream().filter(transition -> transition.getSymbole().equals(symbole)).collect(Collectors.toSet())
+    		.stream().map(t -> t.getCible()).collect(Collectors.toSet()).forEach(t -> sb.append(t));
+    		Etat etatCible = new Etat(sb.toString());
+    		Transition newTransition = new Transition(etatCourant, symbole, etatCible);
+    		automateDeterminise.get(etatCourant).add(newTransition);
+    		sb.setLength(0);
+    	}
+
+    	determinisationRecursive(automateDeterminise, automateDeterminise.get(etatCourant));
+    	
+    	Set<Etat> newT = Sets.newLinkedHashSet();
+    	T.forEach(etatT -> {
+    		Set<Etat> etats = automateDeterminise.keySet();
+    		
+    		etats.forEach(etat -> {
+    			String nomEtat = etat.getNom();
+    			
+    			for (int i = 0; i < nomEtat.length(); i++) {
+    				if (nomEtat.charAt(i) == etatT.getNom().charAt(0))
+    					newT.add(etat);
+    			}
+    		});
+    	});
+    	
+    	T.clear();
+    	T.addAll(newT);
+    	E.clear();
+    	// Filter out empty entries
+    	E.putAll(automateDeterminise.entrySet().stream().filter(entry -> entry.getKey().getNom().length() > 0)
+    			.collect(Collectors.toMap(automate -> automate.getKey(), automate -> automate.getValue())));
+    }
+    
+    private void determinisationRecursive(Map<Etat, List<Transition>> automateDeterminise, List<Transition> transitions) {
+    	List<Transition> newTransitions = new ArrayList<>();
+    	StringBuilder sb = new StringBuilder();
+    	
+    	for (Transition transition : transitions) {
+    		Etat etatCourant = transition.getCible();
+    		if (!automateDeterminise.containsKey(etatCourant)) {
+    			automateDeterminise.put(etatCourant, new ArrayList<>());
+    		}
+    		
+    		for (int i = 0; i < etatCourant.getNom().length(); i++) {
+        		final String nomEtat = String.valueOf(etatCourant.getNom().charAt(i));
+        		List<Etat> etats = E.keySet().stream().filter(etat -> etat.getNom().equals(nomEtat)).collect(Collectors.toList());
+        		
+        		for (Etat etat : etats)
+        			newTransitions = Lists.newArrayList(Iterables.concat(newTransitions, E.get(etat)));
+        	}
+        	
+        	for (String symbole : A) {
+        		// Store to set all transitions with symbol equal to 'symbole'
+        		newTransitions.stream().filter(t -> t.getSymbole().equals(symbole))
+        		// Convert to stream, consisting of only end vertices (etats cibles). Using set prevents storing duplicate values
+        				.collect(Collectors.toSet()).stream().map(t -> t.getCible()).collect(Collectors.toSet())
+        		.forEach(t -> sb.append(t));
+        		
+        		if (sb.length() > 0) {
+        			final Etat etatCible = new Etat(sb.toString());
+        			sb.setLength(0);	// this little shit belongs here
+        			
+        			// Prevent stack overflow if the end vertex is the same and the origin (e.g.: 5 -> 5)
+        			if (automateDeterminise.containsKey(etatCible) && etatCourant.equals(etatCible)) {
+        				// But the store the transition if it uses a different symbol (e.g.: 5 a 5 != 5 b 5)
+        				if (automateDeterminise.get(etatCible).stream().filter(t -> t.getCible().equals(etatCible))
+        						.collect(Collectors.toList()).size() != 0 && automateDeterminise.get(etatCible).stream()
+        						.filter(t -> t.getSymbole().equals(symbole)).collect(Collectors.toList()).size() != 0)
+        						break;
+        			}
+        			
+            		Transition newTransition = new Transition(etatCourant, symbole, etatCible);
+            		if (!automateDeterminise.get(etatCourant).contains(newTransition))
+            			automateDeterminise.get(etatCourant).add(newTransition);
+            		// sb.setLength(0);	// <- I wasted fucking ages debugging because of this little cunt
+        		}
+        	}
+        	
+        	newTransitions.clear();
+        	// Do not visit the vertices, which have been already visited
+        	determinisationRecursive(automateDeterminise, automateDeterminise.get(etatCourant).stream().
+        			filter(t -> !automateDeterminise.containsKey(t.getCible())).collect(Collectors.toList()));
+    	}
     }
     
     public boolean reconnaitLeMot(List<Transition> currentTransitions, String mot) {
@@ -170,7 +297,13 @@ public class Automate {
         		break;
         	}
        
+        	if (mot.length() == 1)
+        		break;
+        	
         	String nextCharacter = String.valueOf(mot.charAt(1));
+        	if (E.get(transition.getCible()) == null) {
+        		break;
+        	}
         	
         	List<Transition> transitions = E.get(transition.getCible()).stream().filter(t -> 
         	t.getSymbole().equals(nextCharacter)).collect(Collectors.toList());

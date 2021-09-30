@@ -1,22 +1,33 @@
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
         Automate automate = new Automate();
+        
         try {
             automate.readFromFile("automate.txt");
             automate.trier();
             automate.display();
             
+            if (!automate.isDeterministe()) {
+            	System.out.println("\nL'automate déterministe:");
+            	automate.determiniser();
+            	automate.display();
+            }
+            
             String mot = "aabbabbaaaaaabbbbbabbbbbbabab";
+            boolean isRecognized = false;
             for (Etat etat : automate.getI()) {
             	List<Transition> transitions = automate.getTransitions(etat);
             	if (transitions != null) {
-            		boolean isRecognized =  automate.reconnaitLeMot(transitions, mot);
-            		System.out.println("Le mot '" + mot + "' " + (isRecognized ? "est bien" : "n'est pas") + " reconnu " + (isRecognized ?  "✔️" : "❌"));
+            		// if the very first letter isn't the same as the first transition symbol, the word won't be recognized
+            		isRecognized = (transitions.stream().filter(t -> t.getSymbole().equals(String.valueOf(mot.charAt(0))))
+            				.collect(Collectors.toList()).size() == 0) ? false : automate.reconnaitLeMot(transitions, mot);
             	}
             }
+            System.out.println("Le mot '" + mot + "' " + (isRecognized ? "est bien" : "n'est pas") + " reconnu " + (isRecognized ?  "✔️" : "❌"));
             
             if (!automate.isStandard()) {
             	System.out.println("\nL'automate standard:");
