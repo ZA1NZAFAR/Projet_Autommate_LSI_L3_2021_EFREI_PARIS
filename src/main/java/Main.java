@@ -16,7 +16,7 @@ public class Main {
 
             automate.display();
             System.out.println("Automate Complet = " + Tools.isComplet(automate));
-            Tools.complete(automate);
+            Tools.makeComplete(automate);
             automate.display();
             System.out.println("Automate Complet = " + Tools.isComplet(automate));
 

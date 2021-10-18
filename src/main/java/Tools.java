@@ -15,7 +15,7 @@ public class Tools {
         return true;
     }
 
-    static void complete(Automate automate) {
+    static void makeComplete(Automate automate) {
         boolean contains;
         automate.getEtats().add(new Etat("p"));
         for (char c : automate.getA()) {
