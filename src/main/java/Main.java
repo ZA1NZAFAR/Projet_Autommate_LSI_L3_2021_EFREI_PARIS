@@ -6,7 +6,6 @@ public class Main {
         try {
             automate.readFromFile("automate.txt");
 
-
             automate.display();
             System.out.println("Automate Standard = " + Tools.isStandard(automate));
             Tools.makeStandard(automate);
