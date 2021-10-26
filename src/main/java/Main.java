@@ -17,6 +17,13 @@ public class Main {
             	automate.display();
             }
             
+            if (!automate.isComplet()) {
+                System.out.println("\nL'automate complet:");
+                automate.completer();
+                automate.display();
+            }
+
+            
             String mot = "aabbabbaaaaaabbbbbabbbbbbabab";
             boolean isRecognized = false;
             for (Etat etat : automate.getI()) {

@@ -132,6 +132,8 @@ public class Automate {
         
         String isDeterministe = isDeterministe() == true ? "est déterministe" : "n'est pas déterministe";
         System.out.println("L'automate " + isDeterministe);
+        String isComplet = isComplet() == true ? "est complet" : "n'est pas complet";
+        System.out.println("L'automate " + isComplet);
         String isStandard = isStandard() == true ? "est standard" : "n'est pas standard";
         System.out.println("L'automate " + isStandard);
     }
@@ -257,6 +259,61 @@ public class Automate {
         	determinisationRecursive(automateDeterminise, automateDeterminise.get(etatCourant).stream().
         			filter(t -> !automateDeterminise.containsKey(t.getCible())).collect(Collectors.toList()));
     	}
+    }
+    
+    public boolean isComplet() {
+
+        for (Map.Entry<Etat, List<Transition>> transition : E.entrySet()) {
+        	for (String symbole : A) {
+        		if (transition.getValue().stream().filter(t -> t.getSymbole().equals(symbole))
+        				.collect(Collectors.toList()).size() == 0)
+        			return false;
+        	}
+        }
+       
+        for (Etat etat : T) {
+        	if(!E.containsKey(etat))
+        			return false;
+       
+        	for (String symbole : A) {
+        		if (E.get(etat).stream().filter(transition -> transition.getSymbole().equals(symbole))
+        				.collect(Collectors.toList()).size() == 0)
+        			return false;
+        	}
+        }
+       
+        return true;
+    }
+       
+    public void completer() {
+    	Etat p = new Etat("P");
+    	
+    	for (Map.Entry<Etat, List<Transition>> transition : E.entrySet()) {
+        	for (String symbole : A) {
+        		if (transition.getValue().stream().filter(t -> t.getSymbole().equals(symbole))
+        				.collect(Collectors.toList()).size() == 0) {
+        			transition.getValue().add(new Transition(transition.getKey(), symbole, p));
+        		}
+        	}
+        }
+    	
+    	for (Etat etat : T) {
+        	if(!E.containsKey(etat)) {
+        		E.put(etat, new ArrayList<>());
+        		for (String symbole : A) {
+            		if (E.get(etat).stream().filter(transition -> transition.getSymbole().equals(symbole))
+            				.collect(Collectors.toList()).size() == 0) {
+            			E.get(etat).add(new Transition(etat, symbole, p));
+            		}
+            	}
+        	}
+        }
+    	
+    	E.put(p, new ArrayList<>());
+    	for (String symbole : A)
+    		E.get(p).add(new Transition(p, symbole, p));
+    	
+    	System.out.println(E);
     }
     
     public boolean reconnaitLeMot(List<Transition> currentTransitions, String mot) {
