@@ -67,7 +67,6 @@ public class Automate {
 
         for (int i = 1; i <= Integer.parseInt(values[0]); i++) {
         	Etat etat = (Etat) Q.toArray()[Integer.parseInt(values[i]) - 1];
-//        	System.out.println(Q.stream().filter(new Etat(values[i])::equals).findAny().orElse(null));
             I.add(etat);
         }
 
@@ -100,7 +99,7 @@ public class Automate {
     }
 
     public void display() {
-    	String indent = String.format("%-" + (A.size() * (Q.size() * 3)) + "s", "");			// spaces.
+    	String indent = String.format("%-" + (A.size() * (Q.size() * 2)) + "s", "");			// spaces between columns
 
         System.out.print("Etats" + indent.substring(0, indent.length() - "Etats".length()));
         for (String a : A) {
@@ -130,7 +129,7 @@ public class Automate {
         System.out.println("\nLes etats initiaux : " + I);
         System.out.println("Les etats terminaux : " + T);
         
-        String isDeterministe = isDeterministe() == true ? "est déterministe" : "n'est pas déterministe";
+        String isDeterministe = isDeterministe() == true ? "est deterministe" : "n'est pas deterministe";
         System.out.println("L'automate " + isDeterministe);
         String isComplet = isComplet() == true ? "est complet" : "n'est pas complet";
         System.out.println("L'automate " + isComplet);
@@ -165,7 +164,6 @@ public class Automate {
     	automateDeterminise.put(etatCourant, new ArrayList<>());
     	
     	for (int i = 0; i < sb.length(); i++) {
-//    		To kindly say 'fuck-off' to compiler (Exp: variable i defined in an enclosing scope must be final or effectively final)
     		final int index = i;
     		List<Etat> etats = E.keySet().stream().filter(etat -> etat.getNom().equals(String.valueOf(sb.charAt(index))))
     				.collect(Collectors.toList());
@@ -240,7 +238,7 @@ public class Automate {
         			
         			// Prevent stack overflow if the end vertex is the same and the origin (e.g.: 5 -> 5)
         			if (automateDeterminise.containsKey(etatCible) && etatCourant.equals(etatCible)) {
-        				// But the store the transition if it uses a different symbol (e.g.: 5 a 5 != 5 b 5)
+        				// But store the transition if it uses a different symbol (e.g.: 5 a 5 != 5 b 5)
         				if (automateDeterminise.get(etatCible).stream().filter(t -> t.getCible().equals(etatCible))
         						.collect(Collectors.toList()).size() != 0 && automateDeterminise.get(etatCible).stream()
         						.filter(t -> t.getSymbole().equals(symbole)).collect(Collectors.toList()).size() != 0)
@@ -250,7 +248,6 @@ public class Automate {
             		Transition newTransition = new Transition(etatCourant, symbole, etatCible);
             		if (!automateDeterminise.get(etatCourant).contains(newTransition))
             			automateDeterminise.get(etatCourant).add(newTransition);
-            		// sb.setLength(0);	// <- I wasted fucking ages debugging because of this little cunt
         		}
         	}
         	
@@ -262,7 +259,6 @@ public class Automate {
     }
     
     public boolean isComplet() {
-
         for (Map.Entry<Etat, List<Transition>> transition : E.entrySet()) {
         	for (String symbole : A) {
         		if (transition.getValue().stream().filter(t -> t.getSymbole().equals(symbole))
@@ -312,8 +308,6 @@ public class Automate {
     	E.put(p, new ArrayList<>());
     	for (String symbole : A)
     		E.get(p).add(new Transition(p, symbole, p));
-    	
-    	System.out.println(E);
     }
     
     public boolean reconnaitLeMot(List<Transition> currentTransitions, String mot) {
@@ -401,8 +395,25 @@ public class Automate {
     }
     
     public void eliminerMotVide() {
-    	// retains only elements which are present in a set, passed as a parameter
+    	// Retains only elements which are present in a set, passed as a parameter
     	T.retainAll(T.stream().filter(etat -> !I.contains(etat)).collect(Collectors.toSet()));
+    }
+    
+    public void langageComplementaire() {
+    	System.out.println(T);
+    	System.out.println(Q);
+    	Set<Etat> notPresentInitiaux = I.stream().filter(e -> !E.keySet().contains(e)).collect(Collectors.toSet());
+    	Set<Etat> notPresentTerminaux = T.stream().filter(e -> !E.keySet().contains(e)).collect(Collectors.toSet());
+    	Set<Etat> notTerminal = E.keySet().stream().filter(etat -> !T.contains(etat)).collect(Collectors.toSet());
+    	
+    	// Add vertices which are either isolated or accept empty word with no outgoing transitions and aren't present in E. 
+    	if (!notPresentInitiaux.isEmpty())
+    		notPresentInitiaux.forEach(e -> notTerminal.add(e));
+    	if (!notPresentTerminaux.isEmpty())
+    		notPresentTerminaux.forEach(e -> notTerminal.add(e));
+    	
+    	T.clear();
+    	notTerminal.forEach(etat -> T.add(etat));
     }
 
     public void trier() {

@@ -11,18 +11,21 @@ public class Main {
             automate.trier();
             automate.display();
             
-            if (!automate.isDeterministe()) {
-            	System.out.println("\nL'automate déterministe:");
-            	automate.determiniser();
-            	automate.display();
-            }
+//            if (!automate.isDeterministe()) {
+//            	System.out.println("\nL'automate déterministe:");
+//            	automate.determiniser();
+//            	automate.display();
+//            }
             
             if (!automate.isComplet()) {
                 System.out.println("\nL'automate complet:");
                 automate.completer();
                 automate.display();
             }
-
+            
+            System.out.println("\nPassage au langage complementaire:");
+            automate.langageComplementaire();
+            automate.display();
             
             String mot = "aabbabbaaaaaabbbbbabbbbbbabab";
             boolean isRecognized = false;
