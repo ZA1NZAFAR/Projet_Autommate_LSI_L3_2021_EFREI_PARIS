@@ -394,6 +394,11 @@ public class Automate {
     	E.put(i, transitions);
     }
     
+    public void ajouterMotVide() {
+    	// Filter out etats which aren't terminal
+    	T.addAll(I.stream().filter(etat -> !T.contains(etat)).collect(Collectors.toSet()));
+    }
+    
     public void eliminerMotVide() {
     	// Retains only elements which are present in a set, passed as a parameter
     	T.retainAll(T.stream().filter(etat -> !I.contains(etat)).collect(Collectors.toSet()));

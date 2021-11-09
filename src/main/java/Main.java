@@ -53,6 +53,15 @@ public class Main {
                     break;
             	}
             }
+            
+            for (Etat etat : automate.getI()) {
+            	if (!automate.getT().contains(etat)) {
+            		System.out.println("\nL'ajout du mot vide:");
+            		automate.ajouterMotVide();
+            		automate.display();
+            		break;
+            	}
+            }
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
