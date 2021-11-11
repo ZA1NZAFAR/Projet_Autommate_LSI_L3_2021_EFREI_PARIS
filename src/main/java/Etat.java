@@ -1,42 +1,41 @@
-import java.util.Objects;
-
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Objects;
 
 @Data
 @NoArgsConstructor
 public class Etat {
-	private String nom;
-	
-	public String getNom() {
-		return nom;
-	}
+    private String nom;
 
-	public void setNom(String nom) {
-		this.nom = nom;
-	}
+    public String getNom() {
+        return nom;
+    }
 
-	public Etat(String nom) {
-		this.nom = nom;
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof Etat))
-			return false;
-    	
-    	Etat etat = (Etat) obj;
-    	return this.nom.equals(etat.nom);
-	}
-	
-	@Override
-	public int hashCode() {
-		return Objects.hash(nom);
-	}
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
 
-	@Override
+    public Etat(String nom) {
+        this.nom = nom;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Etat))
+            return false;
+
+        Etat etat = (Etat) obj;
+        return this.nom.equals(etat.nom);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nom);
+    }
+
+    @Override
     public String toString() {
-		return nom;
-	}
+        return nom;
+    }
 }
