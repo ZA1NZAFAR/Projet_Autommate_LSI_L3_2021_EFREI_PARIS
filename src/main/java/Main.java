@@ -12,6 +12,8 @@ public class Main {
             automate.trier();
             automateComplementaire.trier();
             automate.display();
+
+
             
             // Langage complementaire sur l'automate lu a l'etape 1
             if (!automateComplementaire.isComplet()) {
@@ -34,7 +36,7 @@ public class Main {
                 automate.display();
             }
 
-            String mot = "bc";		// "aabbabbaaaaaabbbbbabbbbbbabab"
+            String mot = "aabbabbaaaaaabbbbbabbbbbbabab";		// "aabbabbaaaaaabbbbbabbbbbbabab"
             boolean isRecognized = false;
             for (Etat etat : automate.getI()) {
                 List<Transition> transitions = automate.getTransitions(etat);

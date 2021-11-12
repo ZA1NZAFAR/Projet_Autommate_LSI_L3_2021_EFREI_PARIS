@@ -178,7 +178,7 @@ public class Automate {
             transitions.stream().filter(transition -> transition.getSymbole().equals(symbole)).collect(Collectors.toSet())
                     .stream().map(Transition::getCible).collect(Collectors.toSet()).forEach(sb::append);
         
-            if (!sb.isEmpty()) {
+            if (sb.length() > 0) {
             	 Etat etatCible = new Etat(sb.toString());
             	Transition newTransition = new Transition(etatCourant, symbole, etatCible);
             	automateDeterminise.get(etatCourant).add(newTransition);
