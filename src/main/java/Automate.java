@@ -127,6 +127,14 @@ public class Automate {
         System.out.println("L'automate " + isComplet);
         String isStandard = isStandard() ? "est standard" : "n'est pas standard";
         System.out.println("L'automate " + isStandard);
+        String isMotVideAccepte = "n'accepte pas le mot vide";
+        for (Etat etat : I) {
+        	if (T.contains(etat)) {
+        		isMotVideAccepte = "accepte le mot vide";
+        		break;
+        	}
+        };
+        System.out.println("L'automate " + isMotVideAccepte);
     }
 
     public boolean isDeterministe() {
@@ -169,9 +177,12 @@ public class Automate {
         for (String symbole : A) {
             transitions.stream().filter(transition -> transition.getSymbole().equals(symbole)).collect(Collectors.toSet())
                     .stream().map(Transition::getCible).collect(Collectors.toSet()).forEach(sb::append);
-            Etat etatCible = new Etat(sb.toString());
-            Transition newTransition = new Transition(etatCourant, symbole, etatCible);
-            automateDeterminise.get(etatCourant).add(newTransition);
+        
+            if (!sb.isEmpty()) {
+            	 Etat etatCible = new Etat(sb.toString());
+            	Transition newTransition = new Transition(etatCourant, symbole, etatCible);
+            	automateDeterminise.get(etatCourant).add(newTransition);
+            }
             sb.setLength(0);
         }
 
@@ -226,7 +237,7 @@ public class Automate {
 
                 if (sb.length() > 0) {
                     final Etat etatCible = new Etat(sb.toString());
-                    sb.setLength(0);    // this little shit belongs here
+                    sb.setLength(0);
 
                     // Prevent stack overflow if the end vertex is the same and the origin (e.g.: 5 -> 5)
                     if (automateDeterminise.containsKey(etatCible) && etatCourant.equals(etatCible)) {
@@ -391,8 +402,6 @@ public class Automate {
     }
 
     public void langageComplementaire() {
-        System.out.println(T);
-        System.out.println(Q);
         Set<Etat> notPresentInitiaux = I.stream().filter(e -> !E.containsKey(e)).collect(Collectors.toSet());
         Set<Etat> notPresentTerminaux = T.stream().filter(e -> !E.containsKey(e)).collect(Collectors.toSet());
         Set<Etat> notTerminal = E.keySet().stream().filter(etat -> !T.contains(etat)).collect(Collectors.toSet());

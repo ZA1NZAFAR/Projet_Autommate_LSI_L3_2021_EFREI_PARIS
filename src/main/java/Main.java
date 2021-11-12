@@ -4,14 +4,26 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         Automate automate = new Automate();
+        Automate automateComplementaire = new Automate();
 
         try {
-            automate.readFromFile("completion.txt");
+            automate.readFromFile("automate.txt");
+            automateComplementaire.readFromFile("automate.txt");
             automate.trier();
+            automateComplementaire.trier();
             automate.display();
+            
+            // Langage complementaire sur l'automate lu a l'etape 1
+            if (!automateComplementaire.isComplet()) {
+            	automateComplementaire.completer();
+            }
+            
+            System.out.println("\nPassage au langage complementaire:");
+        	automateComplementaire.langageComplementaire();
+        	automateComplementaire.display();
 
             if (!automate.isDeterministe()) {
-                System.out.println("\nL'automate déterministe:");
+                System.out.println("\nL'automate deterministe:");
                 automate.determiniser();
                 automate.display();
             }
@@ -22,11 +34,7 @@ public class Main {
                 automate.display();
             }
 
-            System.out.println("\nPassage au langage complementaire:");
-            automate.langageComplementaire();
-            automate.display();
-
-            String mot = "aabbabbaaaaaabbbbbabbbbbbabab";
+            String mot = "bc";		// "aabbabbaaaaaabbbbbabbbbbbabab"
             boolean isRecognized = false;
             for (Etat etat : automate.getI()) {
                 List<Transition> transitions = automate.getTransitions(etat);
@@ -35,7 +43,7 @@ public class Main {
                     isRecognized = transitions.stream().anyMatch(t -> t.getSymbole().equals(String.valueOf(mot.charAt(0)))) && automate.reconnaitLeMot(transitions, mot);
                 }
             }
-            System.out.println("Le mot '" + mot + "' " + (isRecognized ? "est bien" : "n'est pas") + " reconnu " + (isRecognized ? "✔️" : "❌"));
+            System.out.println("Le mot '" + mot + "' " + (isRecognized ? "est bien" : "n'est pas") + " reconnu " + (isRecognized ? "v" : "x"));
 
             if (!automate.isStandard()) {
                 System.out.println("\nL'automate standard:");
