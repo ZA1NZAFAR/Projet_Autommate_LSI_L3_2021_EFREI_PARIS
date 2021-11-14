@@ -12,11 +12,11 @@ import java.util.stream.Stream;
 @Getter
 @Setter
 public class Automate {
-    private final Set<String> A = Sets.newLinkedHashSet();
-    private final Set<Etat> Q = Sets.newLinkedHashSet();
-    private final Set<Etat> I = Sets.newLinkedHashSet();
-    private final Set<Etat> T = Sets.newLinkedHashSet();
-    private final Map<Etat, List<Transition>> E = Maps.newLinkedHashMap();
+    private final Set<String> A = Sets.newLinkedHashSet(); // Alphabet
+    private final Set<Etat> Q = Sets.newLinkedHashSet();   // Etats
+    private final Set<Etat> I = Sets.newLinkedHashSet();   //Etats initiaux
+    private final Set<Etat> T = Sets.newLinkedHashSet();   //Etats terminaux
+    private final Map<Etat, List<Transition>> E = Maps.newLinkedHashMap(); //transitions
 
     public Set<Etat> getI() {
         return I;
@@ -30,6 +30,7 @@ public class Automate {
         return E.get(etat);
     }
 
+    //lecture de fichier txt
     public void readFromFile(String fileName) throws IOException {
         @SuppressWarnings("resource")
         BufferedReader br = new BufferedReader(new FileReader(fileName));
