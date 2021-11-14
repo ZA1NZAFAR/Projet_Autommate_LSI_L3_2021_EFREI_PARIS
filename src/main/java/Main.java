@@ -16,7 +16,7 @@ public class Main {
             automate.display();
 
             //Reconaissance du mot
-            String mot = "aabbabbaaaaaabbbbbabbbbbbabab";		// "aabbabbaaaaaabbbbbabbbbbbabab"
+            String mot = "aabbabbaaaaaabbbbbabbbbbbabab";		// remplacer par le mot a analyser
             boolean isRecognized = false;
             for (Etat etat : automate.getI()) {
                 List<Transition> transitions = automate.getTransitions(etat);
