@@ -6,6 +6,8 @@ public class Main {
         Automate automate = new Automate();
         Automate automateComplementaire = new Automate();
 
+
+
         try {
             automate.readFromFile("automate.txt");
             automateComplementaire.readFromFile("automate.txt");
@@ -13,29 +15,7 @@ public class Main {
             automateComplementaire.trier();
             automate.display();
 
-
-            
-            // Langage complementaire sur l'automate lu a l'etape 1
-            if (!automateComplementaire.isComplet()) {
-            	automateComplementaire.completer();
-            }
-            
-            System.out.println("\nPassage au langage complementaire:");
-        	automateComplementaire.langageComplementaire();
-        	automateComplementaire.display();
-
-            if (!automate.isDeterministe()) {
-                System.out.println("\nL'automate deterministe:");
-                automate.determiniser();
-                automate.display();
-            }
-
-            if (!automate.isComplet()) {
-                System.out.println("\nL'automate complet:");
-                automate.completer();
-                automate.display();
-            }
-
+            //Reconaissance du mot
             String mot = "aabbabbaaaaaabbbbbabbbbbbabab";		// "aabbabbaaaaaabbbbbabbbbbbabab"
             boolean isRecognized = false;
             for (Etat etat : automate.getI()) {
@@ -47,12 +27,38 @@ public class Main {
             }
             System.out.println("Le mot '" + mot + "' " + (isRecognized ? "est bien" : "n'est pas") + " reconnu " + (isRecognized ? "v" : "x"));
 
+
+
+            // Langage complementaire sur l'automate lu a l'etape 1
+            if (!automateComplementaire.isComplet()) {
+            	automateComplementaire.completer();
+            }
+            System.out.println("\nPassage au langage complementaire:");
+        	automateComplementaire.langageComplementaire();
+        	automateComplementaire.display();
+
+            //Determinisation
+            if (!automate.isDeterministe()) {
+                System.out.println("\nL'automate deterministe:");
+                automate.determiniser();
+                automate.display();
+            }
+
+            //Completion
+            if (!automate.isComplet()) {
+                System.out.println("\nL'automate complet:");
+                automate.completer();
+                automate.display();
+            }
+
+            //Standardization
             if (!automate.isStandard()) {
                 System.out.println("\nL'automate standard:");
                 automate.standardiser();
                 automate.display();
             }
 
+            //Elimination mot vide si il est reconnu
             for (Etat etat : automate.getI()) {
                 if (automate.getT().contains(etat)) {
                     System.out.println("\nL'elimination du mot vide:");
@@ -62,6 +68,7 @@ public class Main {
                 }
             }
 
+            //Addition du mot vide si il n'est pas reconnu
             for (Etat etat : automate.getI()) {
                 if (!automate.getT().contains(etat)) {
                     System.out.println("\nL'ajout du mot vide:");

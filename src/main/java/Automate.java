@@ -90,6 +90,7 @@ public class Automate {
         br.close();
     }
 
+    // afficher l'etat d'automate
     public void display() {
         String indent = String.format("%-" + (A.size() * (Q.size() * 2)) + "s", "");            // spaces between columns
 
