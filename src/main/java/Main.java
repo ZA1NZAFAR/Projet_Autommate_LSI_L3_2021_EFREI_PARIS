@@ -9,8 +9,8 @@ public class Main {
 
 
         try {
-            automate.readFromFile("automate.txt");
-            automateComplementaire.readFromFile("automate.txt");
+            automate.readFromFile("src/main/resources/G1.txt");
+            automateComplementaire.readFromFile("src/main/resources/G1.txt");
             automate.trier();
             automateComplementaire.trier();
             automate.display();
